@@ -1,0 +1,59 @@
+{% extends 'blog/base.html' %}
+
+{% block title %} Blog | Users List{{post.title}} {% endblock %}
+
+
+{% block body %}
+        <div class="col-9">
+            <div class="row justify-content-center m-5">
+                {% for user in object_list %}
+                    
+                    <div class="col-10 mx-2 mb-5">
+                        <div class="card p-3">
+                            <div class="row">
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    {% if user.image %}
+                                        <img src="{{user.image.url}}" class="card-img-top" height="150px" width="250px" alt="{{user.username}}">
+                                    {% endif %}
+                                </div>
+                                <div class="col-12 col-md-8 col-lg-6">
+                                    <div class="card-body">
+                                        {% if user.is_superuser %}
+                                            <div class="bg-danger p-1 w-auto">
+                                                <h5 class="card-title">{{user.first_name}} {{user.last_name}}</h5>
+                                                <h5 class="card-title">{{user.username}}</h5>
+                                                <h5 class="card-title">{{user.email}}</h5>
+                                            </div>
+                                            {% if not user.is_staff %}
+                                                <a href="{% url 'make-normal-user' user.id %}" class="btn btn-warning m-3">make normal user</a>
+                                            {% endif %}
+                                        {% else %}
+                                            <div class="bg-light p-1 w-auto">
+                                                <h5 class="card-title">{{user.first_name}} {{user.last_name}}</h5>
+                                                <h5 class="card-title">{{user.username}}</h5>
+                                                <h5 class="card-title">{{user.email}}</h5>
+                                            </div>
+                                        {% endif %}
+                                         {% if not user.is_superuser  and current_user.is_superuser %}
+                                            {% if not user.blocked %}
+                                                <a href="{% url 'block-user' user.id %}" class="btn btn-danger">Block</a>
+                                                <a href="{% url 'pormote-user' user.id %}" class="btn btn-success">make Admin</a>
+                                            {% else %}
+                                                <a href="{% url 'unblock-user' user.id %}"  class="btn btn-primary">Unblock</a>
+                                            {% endif %}
+                                        {% endif %}
+                                        {% if user.blocked %}
+                                            <h3 class="text-danger">BLOCKED!</h3>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor%}
+        </div>
+
+{% endblock %}
+
+
+

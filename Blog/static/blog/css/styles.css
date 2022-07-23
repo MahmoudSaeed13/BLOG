@@ -1,0 +1,9 @@
+div.sticky {
+    position: -webkit-sticky;
+    position: fixed;
+    top: 40;
+  }
+
+.sidebar { 
+    height: 100vh;
+}

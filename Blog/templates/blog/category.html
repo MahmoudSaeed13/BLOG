@@ -1,0 +1,62 @@
+
+{% extends 'blog/base.html' %}
+
+{% block title %}Blog | Home{% endblock %}
+
+{% block sidebar %}
+    <div class="col-3 bg-dark text-white">
+            <div class="sidebar">
+                {% for other_category in categories %}  
+                <div class="mx-4 my-2">
+                    {% if other_category.id != category.id %}
+                    <a class="text-white" href="{% url 'detailed-category' other_category.id %}"><span class="h4">{{other_category}}</span></a> 
+                    {% if user.is_authenticated %}
+                    <a href="" class="mx-2">follow</a>
+                    <a href="" class="">unfollow</a>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block body %}
+        <div class="col-9 p-5">
+            <div class="row justify-content-center">
+                <div class="m-2 p-3 text-center">
+                    <h3>Posts under {{category.title}}</h3>
+                    {% if user.is_superuser %}
+                        <a href="{% url 'delete-category' category.id %}" class="btn btn-danger">delete</a>
+                        <a href="{% url 'edit-category' category.id %}"  class="btn btn-primary">edit</a>
+                    {% endif %}
+                </div>
+                {% for post in category.Category_Posts.all %}  
+                    <div class="col-10 mx-2 mb-5">
+                        <div class="card">
+                            <div class="row">
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    {% if post.image %}
+                                        <img src="{{post.image.url}}" class="card-img-top" height="150px" width="250px" alt="{{post.title}}">
+                                    {% endif %}
+                                </div>
+                                <div class="col-12 col-md-8 col-lg-6">
+                                    <div class="card-body">
+                                        <a href="{% url 'detailed-post' post.id %}" class=""> <h5 class="card-title">{{post.title}}</h5></a>
+                                        {% if user.is_superuser %}
+                                            <a href="{% url 'delete-post' post.id %}" class="btn btn-danger">delete</a>
+                                            <a href="{% url 'edit-post' post.id %}"  class="btn btn-primary">edit</a>
+                                        {% endif %}
+                                    </div>
+                                        <p class="card-text">{{post.body|truncatewords:25}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor%}
+                
+            </div>
+        </div>
+
+{% endblock %}

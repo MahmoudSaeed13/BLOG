@@ -1,0 +1,75 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Blog | Home{% endblock %}
+
+{% block sidebar %}
+    <div class="col-3 bg-dark text-white">
+        <div class="col sidebar">
+            <h3>Categories</h3>
+            {% for category in categories %}
+            <div class="mx-4 my-2">
+                <a class="text-white" href="{% url 'detailed-category' category.id %}"><span class="h4">{{category}}</span></a> 
+                {% if user.is_authenticated %}
+                {% if category in sub_categories %}
+                    <a href="{% url 'unsubscribe' category.id %}" class="">unfollow</a>
+                {% else %}
+                    <a href="{% url 'subscribe' category.id %}" class="mx-2">follow</a>
+                {% endif %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block body %}
+        <div class="col-9 p-5">
+            <div class="row justify-content-center">
+                {% for post in posts %}
+                    
+                    <div class="col-10 mx-2 mb-5">
+                        <div class="card">
+                            <div class="row">
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    {% if post.image %}
+                                        <img src="{{post.image.url}}" class="card-img-top" height="150px" width="250px" alt="{{post.title}}">
+                                    {% endif %}
+                                </div>
+                                <div class="col-12 col-md-8 col-lg-6">
+                                    <div class="card-body">
+                                        <a href="{% url 'detailed-post' post.id %}" class=""> <h5 class="card-title">{{post.title}}</h5></a>
+                                        {% if user.is_superuser %}
+                                        <a href="{% url 'delete-post' post.id %}" class="btn btn-danger">delete</a>
+                                        <a href="{% url 'edit-post' post.id %}"  class="btn btn-primary">edit</a>
+                                        {% endif %}
+                                    </div>
+                                        <p class="card-text">{{post.body|truncatewords:25}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor%}
+                
+            </div>
+            <div class="pagination">
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a class="btn-danger btn-sm" href="?page=1">&laquo; first</a>
+                        <span class="current">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                        </span>
+                        <a class="btn-danger btn-sm" href="?page={{ page_obj.previous_page_number }}">previous</a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                        <a class="btn-danger btn-sm" href="?page={{ page_obj.next_page_number }}">next</a>
+                        <span class="current">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                        </span>
+                        <a class="btn-danger btn-sm" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+{% endblock %}

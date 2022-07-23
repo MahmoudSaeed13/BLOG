@@ -1,0 +1,88 @@
+{% extends 'blog/base.html' %}
+
+{% block title %} Blog | {{post.title}} {% endblock %}
+
+{% block sidebar %}
+    <div class="col-3 border-end border-dark border-3 bg-dark text-light">
+        <div class="">
+            <h4>Related posts to the same category</h4>
+            {% for related_post in post.category.Category_Posts.all %}
+                <div class="m-1 m-md-5">
+                    {% if related_post.id != post.id %}
+                        <a href="{% url 'detailed-post' related_post.id %}" class="text-white h6 lg-h3"><p>{{related_post.title}}</p></a> 
+                    {% endif %}
+                </div>
+
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block body %}
+        <div class="col-9">
+            <div class="row justify-content-center">
+                    <div class="col-10 mx-2 mb-5 text-center">
+                            <h3 class="card-title my-3">{{post.title}} <span class="h6 mx-5">{{post.creator}}</span></h3>
+                            <span class="h6 mx-5">{{post.created_at}}</span>
+                            {% if post.image %}
+                                <img src="{{post.image.url}}" class="card-img-top my-3" alt="{{post.title}}">
+                            {% endif %}
+                            <div class="card-body my-5">
+                                <p class="card-text">{{post.body}}</p>
+                            </div>
+                    </div>
+                    {% if user.is_authenticated %}
+                        <div class="col-10 mx-2 mb-5 text-center">
+                            <p><span class="mx-2">{{likes}}</span> <a href="{% url 'like-post' post.id %}"><i class="fa-solid fa-2x fa-thumbs-up"></i></a> <span class="mx-5"><span class="mx-2">{{dis_likes}}</span> <a class="text-danger" href="{% url 'dislike-post' post.id %}"><i class="fa-solid fa-2x fa-thumbs-down"></i></a></span></p>
+                        </div>
+                    {% endif %}
+                    <div class="col-10 mx-2 mb-5">
+                        {% if user.is_authenticated %}
+                            <div>
+                                <span>add comment:</span>
+                                <form action="{% url 'add-comment' post.id %}" method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <input class="form-control" name="body" id="commentBody" type="text">
+                                    <input type="submit" class="btn btn-outline-dark m-1" value="Comment">
+                                </form> 
+                            </div>
+                            <h4>Comments</h4>
+                            
+                                {% for comment in comments %}
+                                    <div class="border border-dark border-1 p-2">
+                                        <p>{{comment.commentor}}<span class="mx-3">{{comment.created_at}}</span></p>
+                                            <p class="ms-5 bg-light p-2 border-bottom border-dark border-1">{{comment.body}}</p>
+                                            <div class="ms-5">
+                                                {% for reply in replies %}
+                                                    {% if reply.comment.id == comment.id %} 
+                                                        <div>
+                                                            <p>{{reply.commentor}} <span class="mx-3">{{ reply.created_at }}</span></p>
+                                                            <p class="ms-5 bg-light p-2 border-bottom border-dark border-1">{{reply.body}}</p>
+                                                        </div>
+                                                    {% endif %}
+                                                 {% endfor %}       
+                                            </div>
+                                            {% if user.is_authenticated %}
+                                                <div>
+                                                    <span>add reply:</span>
+                                                    <form action="{% url 'add-reply' comment.id %}" method="POST" enctype="multipart/form-data">
+                                                        {% csrf_token %}
+                                                        <input class="form-control" name="body"  type="text">
+                                                        <input type="submit" class="btn btn-outline-dark m-1" value="Reply">
+                                                    </form> 
+                                                </div>
+                                            {% endif %}
+                                    </div>
+                                {% endfor %}
+                            
+                        {% else %}
+                            <div>
+                                <span> <a href="{% url 'login' %}">Login</a> to join the discussion about this artile.</span>
+                                <p>Need to <a href="{% url 'register' %}">Register</a>?</p>    
+                            </div>
+                        {% endif %}
+                </div>
+            </div>
+        </div>
+{% endblock %}

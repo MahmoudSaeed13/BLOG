@@ -1,0 +1,24 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}Blog | Registration{% endblock %}
+{% block body %}
+<section class="">
+    <div class="container m-5">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                 <form action="" class="w-50" method="POST">
+                    {% csrf_token %}
+                     {{form|crispy}}
+                     <div class="text-center my-3">
+                         <input type="submit" value="Login" class="btn btn-outline-dark">
+                     </div>
+                 </form>
+             </div>
+             <div class="col-4 d-none d-md-block text-center">
+                <img src="{% static 'blog/images/undraw_login_re_4vu2.svg' %}" class="img-fluid" alt="registration form">
+            </div>
+         </div>
+    </div>
+</section>
+{% endblock %}
