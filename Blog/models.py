@@ -8,6 +8,15 @@ class User(AbstractUser):
     blocked = models.BooleanField(_('Blocked'), default=False)
     image = models.ImageField(_("User image"), upload_to='user/images/', null=True)
 
+    def __str__(self):
+        return f'{self.username}'
+
+    def serialize(self):
+        return{
+            'username': self.username, 
+            'email':self.email
+        }
+
 class Category(models.Model):
     title = models.CharField(_("Category name"), max_length=50)
     created_at = models.DateTimeField(auto_now_add=True) 
@@ -15,6 +24,12 @@ class Category(models.Model):
 
     def __str__(self):
         return f"{self.title}"
+
+    def serialize(self):
+        return{
+            'title' : self.title
+        } 
+    
 
 class Post(models.Model):
     title = models.CharField(_("Post title"), max_length=150)

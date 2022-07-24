@@ -1,3 +1,4 @@
+from operator import imod
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import generic
@@ -13,7 +14,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.paginator import Paginator
 from Blog.utils import AdminAccess
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from .tasks import send_subscription_email
+import json
 # Create your views here.
 class Custom404View(generic.View):
     def dispatch(self, request, *args, **kwargs):
@@ -113,9 +115,10 @@ class LogOutView(generic.View):
 
 class HomeView(generic.View):
     def get(self, request):
+        
         posts = Post.objects.all().order_by('-created_at')
         categories = Category.objects.all()
-    
+
 
         if request.user.is_authenticated:
             sub_categories = []
@@ -263,22 +266,11 @@ class SubscribeCategory(LoginRequiredMixin,generic.View):
         else:
             messages.warning(request, "Category Already followed.")
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-        domain = get_current_site(request).domain
-        link = reverse('home')
-        url = "http://"+domain+link
-        body = f"Dear {user},\nYou have just followed the category {category} on the BLOG.\nThank you very much and have a nice time at our blog.\n click the link to go to our blog\n\n"
-        message = body + url
-        try:
-            send_mail(
-                subject='Category Subscription notification',
-                message= message,
-                from_email="settings.EMAIL_HOST_USER",
-                recipient_list=[user.email,],
-                fail_silently=False
-            )
-        except Exception:
-            raise ValidationError("Couldn't send the message to the email ! ")
+        current_site = get_current_site(request).domain
+        user_celery = json.dumps(user.serialize())
+        category_celery = json.dumps(category.serialize())
+        send_subscription_email.delay(user_celery, category_celery, current_site)
+        
         return HttpResponseRedirect(reverse('home'))
         
 class UnsubscribeCategory(LoginRequiredMixin,generic.View):
