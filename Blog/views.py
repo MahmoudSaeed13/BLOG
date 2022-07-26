@@ -1,5 +1,5 @@
 from operator import imod
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import generic
 from Blog.forms import LoginForm,CreatePostForm, CreateCategoryForm
@@ -16,6 +16,8 @@ from Blog.utils import AdminAccess
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .tasks import send_subscription_email
 import json
+from Blog.utils import generate_html
+
 # Create your views here.
 class Custom404View(generic.View):
     def dispatch(self, request, *args, **kwargs):
@@ -151,6 +153,8 @@ class DetailPostView(generic.DetailView):
         context['replies'] = Reply.objects.filter(comment__in = list(context['comments']))
         context['likes'] = Likes.objects.filter(action=True).filter(post = kwargs['object'].id).count()
         context['dis_likes'] = Likes.objects.filter(action=False).filter(post = kwargs['object'].id).count()
+        context['post_body'] = generate_html(context['post'].body)
+
         return context
 
 class DetailCategoryView(generic.DetailView):

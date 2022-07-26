@@ -14,3 +14,18 @@ class AdminAccess(AccessMixin):
             return HttpResponseRedirect(reverse("home"))
         return super().dispatch(request, *args, **kwargs)
 
+
+from dominate.tags import div as Div, p as P
+
+def generate_html(value):
+
+    text = value.split('\n')
+
+    div = Div()
+
+    with div:
+        for p in text:
+            P(p)
+    return div.render(pretty=True)
+
+

@@ -22,15 +22,17 @@
 {% block body %}
         <div class="col-9">
             <div class="row justify-content-center">
-                    <div class="col-10 mx-2 mb-5 text-center">
-                            <h3 class="card-title my-3">{{post.title}} <span class="h6 mx-5">{{post.creator}}</span></h3>
-                            <span class="h6 mx-5">{{post.created_at}}</span>
+                    <div class="col-10 mx-2 mb-5">
+                        <article class="bg-light p-3">
+                            <h3 class="card-title my-3  text-center">{{post.title}} <span class="h6 mx-5">{{post.creator}}</span></h3>
+                            <span class="my-2 h6">{{post.category}}</span><span class="h6 mx-5 text-center">{{post.created_at}}</span>
                             {% if post.image %}
                                 <img src="{{post.image.url}}" class="card-img-top my-3" alt="{{post.title}}">
                             {% endif %}
                             <div class="card-body my-5">
-                                <p class="card-text">{{post.body}}</p>
+                                {{post_body | safe}}
                             </div>
+                        </article>
                     </div>
                     {% if user.is_authenticated %}
                         <div class="col-10 mx-2 mb-5 text-center">
