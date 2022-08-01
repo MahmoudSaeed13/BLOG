@@ -7,14 +7,14 @@
         <div class="col sidebar">
             <h3>Categories</h3>
             {% for category in categories %}
-            <div class="mx-4 my-2">
-                <a class="text-white" href="{% url 'detailed-category' category.id %}"><span class="h4">{{category}}</span></a> 
-                {% if user.is_authenticated %}
-                {% if category in sub_categories %}
-                    <a href="{% url 'unsubscribe' category.id %}" class="">unfollow</a>
-                {% else %}
-                    <a href="{% url 'subscribe' category.id %}" class="mx-2">follow</a>
-                {% endif %}
+                <div class="mx-4 my-2">
+                    <a class="text-white" href="{% url 'detailed-category' category.id %}"><span class="h4">{{category}}</span></a> 
+                    {% if user.is_authenticated %}
+                        {% if category in sub_categories %}
+                            <a href="{% url 'unsubscribe' category.id %}" class="">unfollow</a>
+                        {% else %}
+                            <a href="{% url 'subscribe' category.id %}" class="mx-2">follow</a>
+                        {% endif %}
                     {% endif %}
                 </div>
             {% endfor %}

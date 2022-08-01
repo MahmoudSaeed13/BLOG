@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import AccessMixin
 from django.contrib import messages
 from django.urls import reverse
 from django.http import HttpResponseRedirect
+from dominate.tags import div as Div, p as P
 
 class AdminAccess(AccessMixin):
     
@@ -15,17 +16,14 @@ class AdminAccess(AccessMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
-from dominate.tags import div as Div, p as P
 
 def generate_html(value):
 
     text = value.split('\n')
-
+    
     div = Div()
 
     with div:
         for p in text:
             P(p)
     return div.render(pretty=True)
-
-

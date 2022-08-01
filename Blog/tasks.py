@@ -1,6 +1,5 @@
 import json
 from celery import shared_task
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.urls import reverse
 from django.core.exceptions import ValidationError
@@ -15,7 +14,7 @@ def send_subscription_email(self, user_celery, category_celery, current_site):
     user = json.loads(user_celery)
     category = json.loads(category_celery) 
     
-    body = f"Dear {user['username']},\nYou have just followed the category {category['title']} on the BLOG.\nThank you very much and have a nice time at our blog.\n click the link to go to our blog\n\n"
+    body = f"Dear {user['username']},\nYou have just followed the category {category['title']} on the BLOG.\nThank you very much and have a nice time at our blog.\n To explore more on the BLOG click the link below\n\n"
     message = body + url
     
     try:

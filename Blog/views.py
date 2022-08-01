@@ -1,5 +1,4 @@
-from operator import imod
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import generic
 from Blog.forms import LoginForm,CreatePostForm, CreateCategoryForm
@@ -9,7 +8,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
-from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.paginator import Paginator
 from Blog.utils import AdminAccess
@@ -154,7 +152,7 @@ class DetailPostView(generic.DetailView):
         context['likes'] = Likes.objects.filter(action=True).filter(post = kwargs['object'].id).count()
         context['dis_likes'] = Likes.objects.filter(action=False).filter(post = kwargs['object'].id).count()
         context['post_body'] = generate_html(context['post'].body)
-
+        print(context['post_body'])
         return context
 
 class DetailCategoryView(generic.DetailView):
@@ -165,6 +163,16 @@ class DetailCategoryView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(DetailCategoryView, self).get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
+        subscriped_categories = CategorySubscription.objects.filter(user=self.request.user)
+   
+        sub_categories = []
+        if self.request.user.is_authenticated:
+            for category in subscriped_categories:
+                sub_categories.append(category.category)
+        else:
+            sub_categories = []
+
+        context['sub_categories'] = sub_categories
         return context
 
 
@@ -267,13 +275,14 @@ class SubscribeCategory(LoginRequiredMixin,generic.View):
                 category = category
             )
             subscription.save()
+            
+            current_site = get_current_site(request).domain
+            user_celery = json.dumps(user.serialize())
+            category_celery = json.dumps(category.serialize())
+            send_subscription_email.delay(user_celery, category_celery, current_site)
         else:
             messages.warning(request, "Category Already followed.")
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-        current_site = get_current_site(request).domain
-        user_celery = json.dumps(user.serialize())
-        category_celery = json.dumps(category.serialize())
-        send_subscription_email.delay(user_celery, category_celery, current_site)
         
         return HttpResponseRedirect(reverse('home'))
         
